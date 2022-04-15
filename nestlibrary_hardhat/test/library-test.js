@@ -15,6 +15,14 @@ describe('Library Contract', () => {
 
     beforeEach(async () => {
         [owner, addr0, addr1] = await ethers.getSigners();
+
+
+        //Deploy Library Contract
+        const Library = await ethers.getContractFactory('Library');
+        library = await Library.deploy(); 
+    });
+
+
         //console.log(owner, addr0, addr1)
 
         //Deploy Library Contract
@@ -23,6 +31,7 @@ describe('Library Contract', () => {
     });
 
     console.log(process.env);
+
 
     it("Upload File Successfully", async function () {
         let hash = 'gfhfdgfyd';
@@ -75,10 +84,6 @@ describe('Library Contract', () => {
             
             // It shod be continued but can't seem to figure it out
               })
-    
-
-    
-    
 
 });
 
@@ -90,4 +95,32 @@ describe ("Get shared Files", async () => {
     assert.equal(sharedFile.shared_hash, shared_by, "Sharer is correct")
       })
     })
+
+
+
+describe ("File Sharing", async () => {
+    let result , sharedFile
+    const shareFile = await library.shareFile(share_to, ipfsHash)
+      
+      // before async => { ipfsHash 
+      
+      
+      
+    it ("can't be shared to oneself", async () => {
+    let isShare = isSharer._share_to
+    isShare = await library.isSharer()
+    assert.equal(isSharer.sharedFile, "File wasn't shared to oneself")
+
+    })
+
+    it("should only share privately uploaded file", async () => {
+      let result;
+      const shareFile = ""
+      const _share_to = "0x4cbrd3ds25JB2shn2xzr5tD92iz";
+      (shareFile, _share_to) => {from: owner}
+       assert.not.equal( presentPrivatefile);
+})
+
+})
+
 
