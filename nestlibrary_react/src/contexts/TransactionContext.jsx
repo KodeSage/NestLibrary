@@ -1,109 +1,147 @@
-import React, { useEffect, useState } from "react";
-
-
-
+import { toast } from "react-toastify";
+import
+    {
+        createContext,
+        useContext,
+        useState,
+        useEffect,
+        useCallback,
+} from "react";
+import
+    {
+        connectToMetaMask,
+        listenToAccountChanges,
+        hasEthereum,
+        unmountEthListeners,
+        listenToNetworkChanges,
+    } from "../services/web3service";
 import { useNavigate } from "react-router-dom";
 
-const { ethereum } = window;
+import {createEthereumContract} from "../utilis/constants";
 
 
-export const TransactionContext = React.createContext();
-
-
-
+export const TransactionContext = createContext();
 
 
 export const TransactionProvider = ( { children } ) =>
 {
-    const navigate = useNavigate();
-    const [ currentAccount, setCurrentAccount ] = useState( "" );
+
+    const [ isInitiallyFetched, setIsInitiallyFetched ] = useState( false );
+    const [ isConnected, setIsConnected ] = useState( false );
+    const [ hasMetaMask, setHasMetaMask ] = useState( true );
+    const [ address, setAddress ] = useState( false );
     const [ isLoading, SetLoading ] = useState( false );
+    const navigate = useNavigate();
    
-
-
-  
-    
-
-    const checkIfWalletIsConnect = async () =>
+ 
+    const handleWalletConnect = useCallback( () =>  //For Handling Wallet Connections
     {
-        try
+        return ( async () =>
         {
-            if ( !ethereum ) return alert( "Please install MetaMask." );
-            const accounts = await ethereum.request( { method: "eth_accounts" } );
-            // console.log( accounts );
-
-            if ( accounts.length )
+            const address = await connectToMetaMask();
+            
+            if ( !address )
             {
-                setCurrentAccount( accounts[ 0 ] );
+                return toast.error( "Connection Unsuccesful" )
 
-            }
-            else
+            } else
             {
-                window.reload();
-                console.log( "No accounts found" );
+                toast.success( "Connected to MetaMask" );
+                navigate( "/upload" );
             }
-        } catch ( error )
-        {
-            console.log( error );
-
-            throw new Error( "No ethereum object" );
-        }
-
-    };
-
-
-    const connectWallet = async () =>
-    {
-
-        try
-        {
-            if ( !ethereum ) return alert( "Please install MetaMask." );
+            
+            
             SetLoading( true );
-            const accounts = await ethereum.request( { method: "eth_requestAccounts", } );
+            setIsConnected( true );
+            setAddress( address );
 
-            setCurrentAccount( accounts[ 0 ] );
-
-            navigate( '/upload' )
+            localStorage.setItem( "wallet-connection", true );
             SetLoading( false );
+            
+            return true;
 
-        } catch ( error )
+            
+        } )();
+    }, [] );
+
+    const resetValues = useCallback( () =>
+    {
+        return ( async () =>
         {
-            console.log( error );
+            setIsConnected( true );
 
-            throw new Error( "No ethereum object" );
-        }
-        SetLoading( false );
+            localStorage.setItem( "wallet-connection", true );
+
+            return true;
+        } )();
+    }, [] );
+
+    const handleWalletDisconnect = () =>
+    {
+        setIsConnected( false );
+        if (localStorage.removeItem( "wallet-connection" ));
+        toast.error( "Disconnected from Metamask" );
+        window.location.reload();
+        
     };
 
-    const disconnect = async () =>
+    const handleAccountChanged = ( address ) =>
     {
-        try
-        {
-            // if ( ethereum ) return alert( "Please instal MetaMask." );
-            await ethereum.request( { method: "eth_requestAccounts", } );
-
-            setCurrentAccount( " " )
-            window.location.reload();
-        } catch ( error )
-        {
-            console.log( error );
-
-            throw new Error( "No ethereum object" );
-        }
-    }
+        if ( !address ) return handleWalletDisconnect();
+        resetValues();
+    };
+   
+    const handleNetworkChanged = () =>
+    {
+        resetValues();
+    };
 
     useEffect( () =>
     {
-        checkIfWalletIsConnect();
-    }, [] );
+        if ( !isInitiallyFetched ) return;
+
+        if ( !hasEthereum() ) return;
+        listenToAccountChanges( handleAccountChanged );
+        listenToNetworkChanges( handleNetworkChanged );
+        return unmountEthListeners();
+    } );
+
+    useEffect( () =>
+    {
+        if ( isInitiallyFetched ) return;
+        if ( !hasEthereum() )
+        {
+            console.log( "Please Install Meta Mask" );
+            return setHasMetaMask( false );
+        }
+        const isInjected = localStorage.getItem( "wallet-connection" );
+        if ( !isInjected ) return setIsInitiallyFetched( true );
+
+        handleWalletConnect();
+        setIsInitiallyFetched( true );
+        return;
+    }, [ handleWalletConnect, isInitiallyFetched ] );
+
 
     return (
         <TransactionContext.Provider value={ {
-            connectWallet,
-            currentAccount,
-            disconnect,
+            isConnected,
+            setIsConnected,
+            handleWalletConnect,
+            handleWalletDisconnect,
+            hasMetaMask,
+            address,
             isLoading,
         } }>
             { children }
         </TransactionContext.Provider> );
+}
+
+export function useAppContext ()
+{
+    const context = useContext(TransactionContext);
+
+    if ( !context ) throw new Error( "useApp must be used inside a `AppProvider`" );
+
+    return context;
 }

@@ -1,12 +1,13 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import logo from './images/image 1.png';
-import { TransactionContext } from '../contexts/TransactionContext';
-// import { shortenAddress } from '../utilis/shortenAddress';
+import { useAppContext} from "../contexts/TransactionContext";
+import { shortenAddress } from '../utilis/shortenAddress';
 import { Link } from "react-router-dom";
+import { WalletButton } from "../components";
 
 export default function UploadNavBar ()
 {
-    const { currentAccount, disconnect} = useContext( TransactionContext );
+    const { address} = useAppContext();
   return (
 
       <nav className="flex justify-around w-full mx-1 items-center">
@@ -16,9 +17,9 @@ export default function UploadNavBar ()
           </div>
           </Link>
           <div className='bg-nestbackground w-96 rounded-lg text-center'>
-              { currentAccount ?
+              { address ?
                   <div >
-                      { currentAccount }
+                      { shortenAddress( address ) }
                   </div>
                   : 
                   <div>
@@ -27,7 +28,7 @@ export default function UploadNavBar ()
              }
               
           </div>
-          <button className="bg-black p-2 w-60 rounded-lg text-white text-xl font-bold" onClick={disconnect}>Disconnect</button>
+          <WalletButton />
       </nav>
       
   )

@@ -30,7 +30,7 @@ describe('Library Contract', () => {
         library = await Library.deploy("NEST LIBRARY"); 
     });
 
-    console.log(process.env);
+    // console.log(process.env);
 
 
     it("Upload File Successfully", async function () {

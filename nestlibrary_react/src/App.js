@@ -1,6 +1,7 @@
-import React, { useEffect, useState }  from "react";
+import React  from "react";
 import { Routes, Route } from "react-router-dom";
 import { Home, Upload } from './pages';
+
 
 
 // Don't Touch the App.js file, KofMan
@@ -10,9 +11,9 @@ import { Home, Upload } from './pages';
 //  I have set up the routing config in the App.js file
 
 
+
 function App ()
 {
-  
 
   return (
     <Routes>

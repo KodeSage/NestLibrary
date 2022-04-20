@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import logo from './images/image 1.png'
 import { Link } from "react-router-dom";
-import { TransactionContext } from '../contexts/TransactionContext';
-import { Loader } from "../components";
+
+import { WalletButton } from "../components";
  
 const Navbar = () =>
 {
-  const { connectWallet, isLoading } = useContext( TransactionContext );
+
   return (
       <nav className="flex justify-around w-full mx-1 items-center">
         
@@ -33,10 +33,7 @@ const Navbar = () =>
                     About us
                 </li>
           <li>
-            { isLoading ?
-              <Loader /> :
-              <button className='bg-black rounded-lg px-7 py-2 text-white' onClick={connectWallet}> Connect </button>
-            }
+              <WalletButton />
                 </li>
             </ul>
         </div>

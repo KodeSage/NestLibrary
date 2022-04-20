@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-
+import { ToastContainer, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { TransactionProvider } from './contexts/TransactionContext';
 import 
   {
@@ -12,6 +13,7 @@ import
 
 ReactDOM.render(
   <BrowserRouter> 
+    <ToastContainer transition={ Zoom } position="top-center" autoClose={ 2000 } />
     <TransactionProvider>
       <App />
     </TransactionProvider>

@@ -11,6 +11,6 @@ export const createEthereumContract = () =>
 {
     const provider = new ethers.providers.Web3Provider( ethereum );
     const signer = provider.getSigner();
-    const transactionsContract = new ethers.Contract( Abi, Address, signer );
+    const transactionsContract = new ethers.Contract( Address, Abi,  signer );
     return transactionsContract;    
 };
